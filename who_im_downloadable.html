@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Who I'm? — Identity Protocol</title>
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@300;400;500;600;700&family=Orbitron:wght@400;600;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --neon:#00ffe7;--neon2:#bf00ff;
+  --bg:#03050d;--bg2:#060d1a;
+  --panel:rgba(0,255,231,0.03);--border:rgba(0,255,231,0.12);--border2:rgba(0,255,231,0.25);
+  --text:#c0ffe8;--muted:rgba(0,255,231,0.28);
+  --font-display:'Orbitron',monospace;--font-body:'Rajdhani',sans-serif;--font-mono:'Share Tech Mono',monospace;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--text);font-family:var(--font-body);min-height:100vh;overflow-x:hidden;cursor:crosshair;}
+#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.6}
+body::after{content:'';position:fixed;inset:0;pointer-events:none;z-index:9999;background:repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,0.07) 3px,rgba(0,0,0,0.07) 4px);}
+.site-wrap{position:relative;z-index:2;min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:0 1rem 6rem}
+nav{width:100%;max-width:900px;display:flex;align-items:center;justify-content:space-between;padding:1.4rem 0;border-bottom:1px solid var(--border);}
+.nav-logo{font-family:var(--font-display);font-size:1.1rem;font-weight:900;letter-spacing:.1em;color:#fff;text-shadow:0 0 18px var(--neon)}
+.nav-logo span{color:var(--neon)}
+.nav-pills{display:flex;gap:.5rem}
+.pill{font-family:var(--font-mono);font-size:.55rem;letter-spacing:.18em;padding:.28rem .7rem;border:1px solid var(--muted);color:var(--muted);text-transform:uppercase;animation:pillblink 4s ease-in-out infinite}
+.pill:nth-child(2){animation-delay:.8s}.pill:nth-child(3){animation-delay:1.6s}
+@keyframes pillblink{0%,100%{border-color:var(--muted);color:var(--muted)}50%{border-color:rgba(0,255,231,.55);color:rgba(0,255,231,.7)}}
+.hero{width:100%;max-width:900px;text-align:center;padding:5rem 0 3.5rem;}
+.hero-eyebrow{font-family:var(--font-mono);font-size:.6rem;letter-spacing:.35em;color:var(--muted);text-transform:uppercase;margin-bottom:1.4rem}
+.hero-title{font-family:var(--font-display);font-size:clamp(3.5rem,12vw,8rem);font-weight:900;line-height:.88;letter-spacing:-.01em;color:#fff;text-shadow:0 0 60px rgba(0,255,231,.2);margin-bottom:1rem;}
+.hero-title .x{color:var(--neon);text-shadow:0 0 30px var(--neon),0 0 80px rgba(0,255,231,.4)}
+.hero-title .c{color:var(--neon2);text-shadow:0 0 30px var(--neon2)}
+.hero-sub{font-family:var(--font-body);font-size:1.1rem;font-weight:300;color:rgba(192,255,232,.45);letter-spacing:.12em;text-transform:uppercase;margin-bottom:3rem}
+.ticker{display:inline-flex;gap:2.5rem;font-family:var(--font-mono);font-size:.58rem;border:1px solid var(--border);padding:.5rem 1.5rem;color:var(--muted);letter-spacing:.1em;}
+.ticker .val{color:var(--neon)}
+.main-card{width:100%;max-width:680px;margin-top:3rem;}
+.cut-box{position:relative;background:var(--panel);border:1px solid var(--border);padding:2.5rem 2rem;clip-path:polygon(0 0,calc(100% - 20px) 0,100% 20px,100% 100%,20px 100%,0 calc(100% - 20px));}
+.cut-box::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--neon),transparent);animation:scan 4s linear infinite;}
+@keyframes scan{0%{opacity:0;transform:scaleX(0);transform-origin:left}50%{opacity:1}100%{opacity:0;transform:scaleX(0);transform-origin:right}}
+.sec-label{font-family:var(--font-mono);font-size:.52rem;letter-spacing:.32em;text-transform:uppercase;color:var(--muted);margin-bottom:1.2rem;}
+.sec-label::before{content:'// '}
+.input-wrap{display:flex;border:1px solid var(--border2);margin-bottom:.8rem;position:relative;overflow:hidden;}
+.input-wrap::after{content:'';position:absolute;bottom:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--neon),transparent);transform:scaleX(0);transform-origin:left;transition:transform .4s ease;}
+.input-wrap:focus-within::after{transform:scaleX(1)}
+.at-sym{background:rgba(0,255,231,.05);border-right:1px solid var(--border2);padding:0 1rem;display:flex;align-items:center;color:var(--neon);font-size:1.1rem;}
+#uname{background:transparent;border:none;color:var(--neon);font-family:var(--font-mono);font-size:1rem;padding:.9rem 1rem;flex:1;outline:none;caret-color:var(--neon);letter-spacing:.05em;}
+#uname::placeholder{color:var(--muted)}
+.hint{font-size:.65rem;font-family:var(--font-mono);color:var(--muted);margin-bottom:1.6rem;letter-spacing:.04em}
+.hint em{color:rgba(0,255,231,.55);font-style:normal}
+.cta{display:block;width:100%;background:transparent;border:1px solid var(--neon);color:var(--neon);font-family:var(--font-display);font-size:.78rem;font-weight:700;letter-spacing:.22em;text-transform:uppercase;padding:.95rem;cursor:crosshair;position:relative;overflow:hidden;transition:color .2s,box-shadow .2s;clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,12px 100%,0 calc(100% - 12px));}
+.cta::before{content:'';position:absolute;inset:0;background:var(--neon);transform:scaleX(0);transform-origin:left;transition:transform .25s ease;z-index:0;}
+.cta:hover::before{transform:scaleX(1)}.cta:hover{color:#000;box-shadow:0 0 35px rgba(0,255,231,.4)}
+.cta span{position:relative;z-index:1}
+.cta.busy{border-color:var(--muted);color:var(--muted);pointer-events:none}.cta.busy::before{display:none}
+.log-box{display:none;background:rgba(0,0,0,.5);border:1px solid var(--border);padding:.9rem 1.1rem;margin-top:1.2rem;font-family:var(--font-mono);font-size:.65rem;line-height:2;max-height:200px;overflow:hidden;}
+.log-box.on{display:block;animation:fadein .3s}
+@keyframes fadein{from{opacity:0}to{opacity:1}}
+.ll .ok{color:var(--neon)}.ll .v{color:#fff}
+.cur{display:inline-block;width:6px;height:.85em;background:var(--neon);vertical-align:text-bottom;animation:blink .6s step-end infinite}
+@keyframes blink{50%{opacity:0}}
+.result{display:none;margin-top:1.5rem}
+.result.on{display:block;animation:slideup .5s ease}
+@keyframes slideup{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+
+.verdict-card{position:relative;border:1px solid var(--border2);overflow:hidden;margin-bottom:1rem;clip-path:polygon(0 0,calc(100% - 24px) 0,100% 24px,100% 100%,24px 100%,0 calc(100% - 24px));}
+.verdict-glow{position:absolute;inset:0;opacity:.07;pointer-events:none;}
+
+.card-hero{display:flex;align-items:stretch;border-bottom:1px solid var(--border);}
+.card-emoji-col{display:flex;align-items:center;justify-content:center;padding:2rem 1.6rem;border-right:1px solid var(--border);font-size:4rem;line-height:1;flex-shrink:0;animation:popIn .5s cubic-bezier(.34,1.56,.64,1);}
+.card-title-col{flex:1;padding:1.6rem 1.8rem;display:flex;flex-direction:column;justify-content:center;gap:.4rem;}
+.card-user-label{font-family:var(--font-mono);font-size:.48rem;letter-spacing:.26em;text-transform:uppercase;color:var(--muted);}
+.card-fun-title{font-family:var(--font-display);font-size:clamp(1.8rem,6vw,3.2rem);font-weight:900;line-height:.9;letter-spacing:.04em;text-shadow:0 0 30px currentColor;animation:popIn .6s cubic-bezier(.34,1.56,.64,1);}
+.card-score-badge{display:inline-block;font-family:var(--font-mono);font-size:.55rem;letter-spacing:.14em;text-transform:uppercase;padding:.22rem .6rem;border:1px solid;width:fit-content;}
+
+.card-bar-block{padding:1.4rem 1.8rem 1rem;border-bottom:1px solid var(--border);}
+.bar-hdr{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:.4rem}
+.bar-lbl{font-family:var(--font-mono);font-size:.5rem;letter-spacing:.22em;text-transform:uppercase;color:var(--muted)}
+.bar-num{font-family:var(--font-display);font-size:2rem;font-weight:700}
+.track{height:3px;background:rgba(255,255,255,.06);overflow:visible;position:relative;margin-bottom:1rem;}
+.track-fill{height:100%;width:0%;transition:width 1.4s cubic-bezier(.22,1,.36,1);position:relative;}
+.track-fill::after{content:'';position:absolute;right:-1px;top:-3px;bottom:-3px;width:2px;background:#fff;box-shadow:0 0 8px #fff}
+.sub-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:rgba(0,255,231,.06);border:1px solid rgba(0,255,231,.06);}
+.sb{background:var(--bg2);padding:.65rem .4rem;text-align:center}
+.sbv{font-family:var(--font-display);font-size:.82rem;font-weight:700;display:block;margin-bottom:.15rem}
+.sbl{font-size:.4rem;font-family:var(--font-mono);letter-spacing:.12em;text-transform:uppercase;color:var(--muted);display:block}
+
+.card-meta-block{padding:1.2rem 1.8rem;}
+.meta-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:.7rem;}
+.meta-key{font-family:var(--font-mono);font-size:.48rem;letter-spacing:.22em;text-transform:uppercase;color:var(--muted);}
+.meta-val{font-family:var(--font-mono);font-size:.5rem;color:rgba(255,255,255,.35);letter-spacing:.04em;}
+.meta-val b{color:rgba(255,255,255,.5)}
+.vdesc{font-size:.8rem;font-family:var(--font-body);line-height:1.85;color:rgba(192,255,232,.4);border-left:2px solid;padding-left:1rem;margin-top:.8rem;}
+
+@keyframes popIn{from{opacity:0;transform:scale(.7)}to{opacity:1;transform:scale(1)}}
+
+.txp{background:rgba(0,0,0,.35);border:1px solid var(--border);padding:1rem 1.2rem;margin-bottom:1rem}
+.txhdr{font-family:var(--font-mono);font-size:.5rem;letter-spacing:.26em;text-transform:uppercase;color:var(--muted);margin-bottom:.7rem}
+.txrow{display:flex;justify-content:space-between;align-items:center;padding:.36rem 0;border-bottom:1px solid rgba(255,255,255,.04);font-family:var(--font-mono);font-size:.6rem}
+.txrow:last-child{border-bottom:none}
+.txhash{color:rgba(255,255,255,.15)}
+.txtag{padding:.1rem .4rem;font-size:.48rem;letter-spacing:.07em;border:1px solid}
+.txval{font-family:var(--font-display);font-size:.72rem;font-weight:700}
+.cons{background:rgba(0,0,0,.35);border:1px solid var(--border);padding:1rem 1.2rem}
+.croww{display:flex;align-items:center;gap:.7rem;font-family:var(--font-mono);font-size:.57rem;margin-bottom:.32rem}
+.croww:last-child{margin-bottom:0}
+.cnode{color:var(--muted);min-width:65px}
+.ctrack{flex:1;height:2px;background:rgba(255,255,255,.05)}
+.cfill{height:100%;width:0%;transition:width 1.2s ease}
+.cpct{min-width:30px;text-align:right;color:rgba(0,255,231,.5);font-size:.57rem}
+
+/* ── DOWNLOAD BUTTON ── */
+.dl-btn{
+  display:flex;align-items:center;justify-content:center;gap:.7rem;
+  width:100%;
+  background:transparent;
+  border:1px solid rgba(0,255,231,.35);
+  color:rgba(0,255,231,.7);
+  font-family:var(--font-display);font-size:.7rem;font-weight:700;
+  letter-spacing:.2em;text-transform:uppercase;
+  padding:.85rem;
+  cursor:crosshair;
+  position:relative;overflow:hidden;
+  transition:color .2s,box-shadow .2s;
+  margin-bottom:1rem;
+  clip-path:polygon(0 0,calc(100% - 12px) 0,100% 12px,100% 100%,12px 100%,0 calc(100% - 12px));
+}
+.dl-btn::before{content:'';position:absolute;inset:0;background:var(--neon);transform:scaleX(0);transform-origin:left;transition:transform .25s ease;z-index:0;}
+.dl-btn:hover::before{transform:scaleX(1)}
+.dl-btn:hover{color:#000;box-shadow:0 0 30px rgba(0,255,231,.3)}
+.dl-btn span{position:relative;z-index:1;display:flex;align-items:center;gap:.6rem;}
+.dl-btn.capturing{border-color:var(--muted);color:var(--muted);pointer-events:none;}
+.dl-btn.capturing::before{display:none;}
+.dl-icon{font-size:1rem;line-height:1;}
+
+footer{font-family:var(--font-mono);font-size:.5rem;color:rgba(255,255,255,.07);text-align:center;margin-top:3rem;letter-spacing:.1em}
+.particles{position:fixed;inset:0;pointer-events:none;z-index:1}
+.pt{position:absolute;width:1px;height:1px;background:var(--neon);border-radius:50%;animation:float linear infinite;opacity:0}
+@keyframes float{0%{opacity:0;transform:translateY(100vh)}10%{opacity:.6}90%{opacity:.3}100%{opacity:0;transform:translateY(-10vh) translateX(var(--dx))}}
+.corner{position:absolute;width:16px;height:16px;border-color:var(--neon);border-style:solid}
+.tl{top:-1px;left:-1px;border-width:2px 0 0 2px}.tr{top:-1px;right:-1px;border-width:2px 2px 0 0}
+.bl{bottom:-1px;left:-1px;border-width:0 0 2px 2px}.br{bottom:-1px;right:-1px;border-width:0 2px 2px 0}
+</style>
+</head>
+<body>
+<canvas id="bg-canvas"></canvas>
+<div class="particles" id="pts"></div>
+<div class="site-wrap">
+  <nav>
+    <div class="nav-logo">Who <span>I'm?</span></div>
+    <div class="nav-pills">
+      <div class="pill">⬡ MAINNET</div>
+      <div class="pill" id="blkpill">BLK #19,482,331</div>
+      <div class="pill" id="nodepill">2,841 NODES</div>
+    </div>
+  </nav>
+  <section class="hero">
+    <p class="hero-eyebrow">Decentralized Identity Protocol · v2.4.1</p>
+    <h1 class="hero-title"><span class="x">Who</span> <span class="c">I'm?</span></h1>
+    <p class="hero-sub">Find Out Who You Really Are</p>
+    <div class="ticker">
+      <span>PROTOCOL <span class="val">ACTIVE</span></span>
+      <span>AVG CONFIRM <span class="val">24ms</span></span>
+      <span>REP INDEX <span class="val" id="repidx">4.829</span></span>
+      <span>UPTIME <span class="val">99.97%</span></span>
+    </div>
+  </section>
+
+  <div class="main-card">
+    <div class="cut-box" style="position:relative">
+      <div class="corner tl"></div><div class="corner tr"></div>
+      <div class="corner bl"></div><div class="corner br"></div>
+      <p class="sec-label">Query Target Address</p>
+      <div class="input-wrap">
+        <span class="at-sym">@</span>
+        <input type="text" id="uname" placeholder="enter x username" maxlength="50" autocomplete="off" spellcheck="false">
+      </div>
+      <p class="hint">Chain pulls <em>posts · impressions · active days · account age</em> from ledger</p>
+      <button class="cta" id="sbtn" onclick="startScan()"><span>⬡ &nbsp; INITIATE CHAIN SCAN</span></button>
+    </div>
+    <div class="log-box" id="log"></div>
+
+    <div class="result" id="result">
+
+      <!-- capture target -->
+      <div id="captureZone" style="background:var(--bg);padding:0;">
+
+        <div class="verdict-card" id="vcard">
+          <div class="verdict-glow" id="vglow"></div>
+          <div class="corner tl" style="border-color:currentColor"></div>
+          <div class="corner br" style="border-color:currentColor"></div>
+
+          <div class="card-hero">
+            <div class="card-emoji-col" id="trEmoji">—</div>
+            <div class="card-title-col">
+              <p class="card-user-label">// @<span id="trUser">—</span> · identity confirmed on-chain</p>
+              <div class="card-fun-title" id="trText">—</div>
+              <span class="card-score-badge" id="scoreBadge">SCORE —</span>
+            </div>
+          </div>
+
+          <div class="card-bar-block">
+            <div class="bar-hdr">
+              <span class="bar-lbl">Who I'm? Score</span>
+              <span class="bar-num" id="snum">0</span>
+            </div>
+            <div class="track"><div class="track-fill" id="tfill"></div></div>
+            <div class="sub-grid">
+              <div class="sb"><span class="sbv" id="sb1">0</span><span class="sbl">Post Freq</span></div>
+              <div class="sb"><span class="sbv" id="sb2">0</span><span class="sbl">Reach</span></div>
+              <div class="sb"><span class="sbv" id="sb3">0</span><span class="sbl">Activity</span></div>
+              <div class="sb"><span class="sbv" id="sb4">0</span><span class="sbl">Longevity</span></div>
+            </div>
+          </div>
+
+          <div class="card-meta-block">
+            <div class="meta-row">
+              <span class="meta-key">BLOCK</span>
+              <span class="meta-val" id="vtag">——</span>
+            </div>
+            <div class="meta-row">
+              <span class="meta-key">WALLET</span>
+              <span class="meta-val"><b id="waddr">0x000…000</b></span>
+            </div>
+            <p class="vdesc" id="vdesc"></p>
+          </div>
+        </div>
+
+        <div class="txp">
+          <p class="txhdr">// recent reputation transactions</p>
+          <div id="txlist"></div>
+        </div>
+        <div class="cons" style="margin-bottom:0">
+          <p class="txhdr">// node consensus breakdown</p>
+          <div id="consrows"></div>
+        </div>
+
+      </div><!-- /captureZone -->
+
+      <!-- DOWNLOAD BUTTON — outside capture zone -->
+      <button class="dl-btn" id="dlBtn" onclick="downloadCard()">
+        <span><span class="dl-icon">⬇</span> DOWNLOAD IDENTITY CARD</span>
+      </button>
+
+    </div>
+  </div>
+  <footer>* Who I'm? is satirical. No real data is fetched — stats generated from username for entertainment only.</footer>
+</div>
+
+<script>
+(function(){
+  const c=document.getElementById('bg-canvas'),ctx=c.getContext('2d');
+  let W,H;
+  function resize(){W=c.width=window.innerWidth;H=c.height=window.innerHeight}
+  resize();window.addEventListener('resize',resize);
+  let t=0;
+  function draw(){
+    ctx.clearRect(0,0,W,H);const sz=60;
+    ctx.strokeStyle='rgba(0,255,231,0.04)';ctx.lineWidth=.5;
+    for(let x=0;x<W;x+=sz){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke()}
+    for(let y=0;y<H;y+=sz){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke()}
+    const ly=(t*0.3)%H;
+    const grd=ctx.createLinearGradient(0,ly-30,0,ly+30);
+    grd.addColorStop(0,'rgba(0,255,231,0)');grd.addColorStop(.5,'rgba(0,255,231,0.08)');grd.addColorStop(1,'rgba(0,255,231,0)');
+    ctx.fillStyle=grd;ctx.fillRect(0,ly-30,W,60);
+    t++;requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+(function(){
+  const c=document.getElementById('pts');
+  for(let i=0;i<40;i++){
+    const p=document.createElement('div');p.className='pt';
+    p.style.left=Math.random()*100+'vw';
+    p.style.setProperty('--dx',(Math.random()*80-40)+'px');
+    p.style.animationDuration=(8+Math.random()*18)+'s';
+    p.style.animationDelay=(-Math.random()*20)+'s';
+    if(Math.random()>.7)p.style.background='#bf00ff';
+    if(Math.random()>.85)p.style.background='#ff003c';
+    c.appendChild(p);
+  }
+})();
+
+setInterval(()=>{
+  const b=document.getElementById('blkpill');
+  const n=parseInt(b.textContent.replace(/[^0-9]/g,''));
+  b.textContent='BLK #'+(n+1).toLocaleString();
+  document.getElementById('nodepill').textContent=(2800+Math.floor(Math.random()*100)).toLocaleString()+' NODES';
+  document.getElementById('repidx').textContent=(4+Math.random()).toFixed(3);
+},3000);
+
+function hash(s){let h=5381;for(let i=0;i<s.length;i++){h=((h<<5)+h)^s.charCodeAt(i);h=h>>>0;}return h;}
+function rng(seed){const x=Math.sin(seed*9301+49297)*233280;return x-Math.floor(x);}
+function fh(seed,len){const hex='0123456789abcdef';let o='';for(let i=0;i<len;i++)o+=hex[Math.floor(rng(seed+i)*16)];return o;}
+
+const TIERS=[
+  {name:'JOKER',color:'#cc44ff',glow:'rgba(204,68,255,.12)',range:[0,20],
+   desc:"The chain does not lie. Low post frequency, negligible reach, ghost-level activity. Your reputation wallet is nearly empty. Validators have checked — twice.",
+   txs:['POST_FLOP','REPLY_MISS','RATIO_RECV'],txv:['-14','-9','-21'],txc:['#ff3355','#ff3355','#ff3355'],
+   cons:[['Joker','89%'],['Normal','9%'],['Other','2%']]},
+  {name:'NORMAL',color:'#00aaff',glow:'rgba(0,170,255,.1)',range:[20,40],
+   desc:"Moderate existence confirmed. Some posts, some views, some days online. The algorithm registers you with mild indifference. Not a ghost, not a force. Just... present.",
+   txs:['SCROLL_EVT','LIKE_CAST','POST_VOID'],txv:['+2','+1','-3'],txc:['#00cc66','#00cc66','#ff3355'],
+   cons:[['Normal','71%'],['Joker','20%'],['Trusted','9%']]},
+  {name:'TRUSTED',color:'#00ffe7',glow:'rgba(0,255,231,.1)',range:[40,60],
+   desc:"Solid metrics across the board. You post with consistency, your reach is real, and the account has history. Validators approve. You have earned your place on the ledger.",
+   txs:['QUOTE_WIN','POST_HIT','STAKE_DEP'],txv:['+18','+24','+11'],txc:['#00ffe7','#00ffe7','#00ffe7'],
+   cons:[['Trusted','62%'],['Scammer','24%'],['Normal','14%']]},
+  {name:'SCAMMER',color:'#ffaa00',glow:'rgba(255,170,0,.1)',range:[60,80],
+   desc:"High impressions. High activity. Suspicious velocity. The smart contract flags your pattern: engagement is there but the signal is unclear. The nodes are still deciding.",
+   txs:['FARM_LOOP','PROMO_CAST','HYPE_TX'],txv:['+44','+31','+52'],txc:['#ffaa00','#ffaa00','#ffaa00'],
+   cons:[['Scammer','55%'],['Gooner','31%'],['Trusted','14%']]},
+  {name:'GOONER',color:'#ff003c',glow:'rgba(255,0,60,.12)',range:[80,101],
+   desc:"Maximum chain saturation. Every metric is off the charts. You have merged with the platform. The algorithm does not serve you — you ARE the algorithm.",
+   txs:['VIRAL_TX','ALGO_BOND','MIND_MELD'],txv:['+188','+241','+312'],txc:['#ff003c','#ff003c','#ff003c'],
+   cons:[['Gooner','88%'],['Scammer','9%'],['Other','3%']]},
+];
+function getTier(s){return TIERS.find(t=>s>=t.range[0]&&s<t.range[1])||TIERS[4];}
+
+const TITLES=[
+  {label:'Joker 🤡',color:'#cc44ff'},
+  {label:'Gey 👅',color:'#ff69b4'},
+  {label:'Legend 🗿',color:'#aaaaaa'},
+  {label:'Scammer 💩',color:'#ffaa00'},
+  {label:'Pookie 🎀',color:'#ff6bba'},
+  {label:'Motherf#cker 🤣',color:'#00aaff'},
+  {label:'Gooner 💦',color:'#00ffe7'},
+  {label:'Broke 💔',color:'#888888'},
+  {label:'Trump son 👽',color:'#bf00ff'},
+];
+
+let lt=null,curUser='',curTitleIdx=-1,titleQueue=[];
+function buildQueue(ex){
+  const arr=TITLES.map((_,i)=>i).filter(i=>i!==ex);
+  for(let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]];}
+  return arr;
+}
+function nextTitle(){if(titleQueue.length===0)titleQueue=buildQueue(curTitleIdx);curTitleIdx=titleQueue.shift();return curTitleIdx;}
+
+function addLog(html){
+  const el=document.createElement('div');el.className='ll';el.innerHTML=html;
+  const log=document.getElementById('log');log.appendChild(el);log.scrollTop=9999;
+}
+
+let lastUser='unknown';
+
+function startScan(){
+  const raw=document.getElementById('uname').value.trim().replace(/^@/,'');
+  if(!raw){document.getElementById('uname').focus();return;}
+  lastUser=raw;
+  const btn=document.getElementById('sbtn');
+  btn.classList.add('busy');btn.querySelector('span').textContent='⬡  SCANNING CHAIN...';
+  document.getElementById('result').classList.remove('on');
+  document.getElementById('result').style.display='none';
+  const log=document.getElementById('log');log.innerHTML='';log.classList.add('on');
+  const h=hash(raw.toLowerCase()+Date.now());
+  const s1=Math.floor(Math.random()*26),s2=Math.floor(Math.random()*26);
+  const s3=Math.floor(Math.random()*26),s4=Math.floor(Math.random()*26);
+  const score=Math.min(100,s1+s2+s3+s4);
+  const tier=getTier(score);
+  const wallet='0x'+fh(h,8)+'…'+fh(h+99,6);
+  const blockNum=Math.floor(Math.random()*1000000+19000000);
+  if(raw!==curUser){curUser=raw;curTitleIdx=-1;titleQueue=buildQueue(-1);}
+  nextTitle();
+  const steps=[
+    `<span class="ok">▶</span> Resolving @<span class="v">${raw}</span> on XChain network...`,
+    `<span class="ok">▶</span> Wallet mapped → <span class="v">${wallet}</span>`,
+    `<span class="ok">▶</span> Scanning on-chain reputation ledger...`,
+    `<span class="ok">▶</span> Cross-referencing <span class="v">2,841</span> validator nodes...`,
+    `<span class="ok">▶</span> Scores → Freq <span class="v">${s1}</span> · Reach <span class="v">${s2}</span> · Activity <span class="v">${s3}</span> · Longevity <span class="v">${s4}</span>`,
+    `<span class="ok">▶</span> Block <span class="v">#${blockNum.toLocaleString()}</span> confirmed · consensus forming...`,
+    `<span class="ok">▶</span> WHO I'M? score: <span class="v">${score}/100</span>`,
+    `<span class="ok">✔</span> VERDICT: <span class="v">${tier.name}</span> — LOCKED ON-CHAIN <span class="cur"></span>`,
+  ];
+  let i=0;if(lt)clearInterval(lt);
+  lt=setInterval(()=>{
+    if(i<steps.length){addLog(steps[i]);i++;}
+    else{
+      clearInterval(lt);
+      setTimeout(()=>{
+        btn.classList.remove('busy');btn.querySelector('span').textContent='⬡  INITIATE CHAIN SCAN';
+        renderResult(raw,score,s1,s2,s3,s4,tier,wallet,blockNum,h);
+      },420);
+    }
+  },220);
+}
+
+function renderResult(u,score,s1,s2,s3,s4,tier,wallet,blockNum,h){
+  const c=tier.color;
+  const t=TITLES[curTitleIdx];
+  const parts=t.label.match(/^(.*?)\s*([\p{Emoji_Presentation}\p{Extended_Pictographic}]+)$/u);
+  const name=parts?parts[1]:t.label;
+  const emoji=parts?parts[2]:'';
+
+  const vc=document.getElementById('vcard');
+  vc.style.borderColor=c+'66';vc.style.color=c;
+  document.getElementById('vglow').style.background=tier.glow;
+
+  const em=document.getElementById('trEmoji');
+  em.textContent=emoji;em.style.animation='none';void em.offsetWidth;em.style.animation='';
+  document.getElementById('trUser').textContent=u;
+  const ft=document.getElementById('trText');
+  ft.textContent=name;ft.style.color=t.color;
+  ft.style.textShadow='0 0 30px '+t.color+',0 0 60px '+t.color+'55';
+  ft.style.animation='none';void ft.offsetWidth;ft.style.animation='';
+
+  const sb=document.getElementById('scoreBadge');
+  sb.textContent='SCORE '+score+' / 100';
+  sb.style.borderColor=c+'88';sb.style.color=c;
+
+  const sn=document.getElementById('snum');sn.textContent=score;sn.style.color=c;
+  const fill=document.getElementById('tfill');
+  fill.style.background=`linear-gradient(90deg,${c}88,${c})`;fill.style.width='0%';
+  [['sb1',s1],['sb2',s2],['sb3',s3],['sb4',s4]].forEach(([id,v])=>{
+    const el=document.getElementById(id);el.textContent=v+'/25';el.style.color=c;
+  });
+
+  document.getElementById('vtag').textContent='#'+blockNum.toLocaleString();
+  document.getElementById('waddr').textContent=wallet;
+  const vd=document.getElementById('vdesc');
+  vd.textContent=tier.desc;vd.style.borderColor=c+'55';
+
+  const tl=document.getElementById('txlist');tl.innerHTML='';
+  tier.txs.forEach((type,i)=>{
+    const d=document.createElement('div');d.className='txrow';
+    d.innerHTML=`<span class="txhash">0x${fh(h+i*17,6)}…${fh(h+i*3+44,4)}</span><span class="txtag" style="border-color:${tier.txc[i]};color:${tier.txc[i]}">${type}</span><span class="txval" style="color:${tier.txc[i]}">${tier.txv[i]}</span>`;
+    tl.appendChild(d);
+  });
+
+  const cr=document.getElementById('consrows');cr.innerHTML='';
+  tier.cons.forEach(([node,pct])=>{
+    const d=document.createElement('div');d.className='croww';
+    d.innerHTML=`<span class="cnode">${node}</span><div class="ctrack"><div class="cfill" style="background:${c}" data-w="${pct}"></div></div><span class="cpct">${pct}</span>`;
+    cr.appendChild(d);
+  });
+
+  const res=document.getElementById('result');
+  res.style.display='block';res.classList.add('on');
+  setTimeout(()=>{
+    fill.style.width=score+'%';
+    document.querySelectorAll('.cfill').forEach(el=>{el.style.width=el.dataset.w;});
+  },80);
+
+  // reset download button
+  const dl=document.getElementById('dlBtn');
+  dl.classList.remove('capturing');
+  dl.querySelector('span').innerHTML='<span class="dl-icon">⬇</span> DOWNLOAD IDENTITY CARD';
+}
+
+async function downloadCard(){
+  const btn=document.getElementById('dlBtn');
+  btn.classList.add('capturing');
+  btn.querySelector('span').innerHTML='<span class="dl-icon">◌</span> CAPTURING...';
+
+  const el=document.getElementById('captureZone');
+  try{
+    const canvas=await html2canvas(el,{
+      backgroundColor:'#03050d',
+      scale:2,
+      useCORS:true,
+      logging:false,
+      onclone:(doc)=>{
+        // ensure progress bars render at their set width in the clone
+        doc.querySelectorAll('.track-fill').forEach(f=>{
+          f.style.transition='none';
+        });
+        doc.querySelectorAll('.cfill').forEach(f=>{
+          f.style.transition='none';
+        });
+      }
+    });
+    const link=document.createElement('a');
+    link.download='whoim-'+lastUser+'.png';
+    link.href=canvas.toDataURL('image/png');
+    link.click();
+    btn.classList.remove('capturing');
+    btn.querySelector('span').innerHTML='<span class="dl-icon">✔</span> DOWNLOADED!';
+    setTimeout(()=>{
+      btn.querySelector('span').innerHTML='<span class="dl-icon">⬇</span> DOWNLOAD IDENTITY CARD';
+    },2500);
+  }catch(e){
+    btn.classList.remove('capturing');
+    btn.querySelector('span').innerHTML='<span class="dl-icon">⬇</span> DOWNLOAD IDENTITY CARD';
+  }
+}
+
+document.getElementById('uname').addEventListener('keydown',e=>{if(e.key==='Enter')startScan();});
+</script>
+</body>
+</html>
