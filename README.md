@@ -1,2 +1,2 @@
-. Active open source contributor
+Active open source contributor
  commits 
